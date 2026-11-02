@@ -16,10 +16,27 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 
-import { Home } from '@/features/home'
+// Tide: nginx serves our custom landing page at exactly "/". The built-in
+// default Home must never render inside the SPA, so any client-side
+// navigation to "/" (nav "Home" link, logo, redirects, back button) does a
+// full page load to "/" instead.
+// Guard: if this document itself was loaded at "/" (SPA served directly
+// without the nginx landing), don't reload in a loop - just render nothing.
+const initialPath =
+  typeof window !== 'undefined' ? window.location.pathname : '/'
+
+function TideLandingRedirect() {
+  useEffect(() => {
+    if (initialPath !== '/') {
+      window.location.replace('/')
+    }
+  }, [])
+  return null
+}
 
 export const Route = createFileRoute('/')({
-  component: Home,
+  component: TideLandingRedirect,
 })

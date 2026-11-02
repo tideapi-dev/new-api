@@ -18,7 +18,10 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { describe, expect, test } from 'vitest'
 
-import { convertDetectedLanguage } from './languages'
+import {
+  convertDetectedLanguage,
+  normalizeInterfaceLanguage,
+} from './languages'
 
 describe('convertDetectedLanguage', () => {
   test('maps browser BCP-47 Chinese tags onto interface codes', () => {
@@ -45,5 +48,32 @@ describe('convertDetectedLanguage', () => {
     expect(convertDetectedLanguage('en')).toBe('en')
     expect(convertDetectedLanguage('fr-FR')).toBe('fr-FR')
     expect(convertDetectedLanguage('ja')).toBe('ja')
+    expect(convertDetectedLanguage('es-MX')).toBe('es-MX')
+    expect(convertDetectedLanguage('pt-BR')).toBe('pt-BR')
+    expect(convertDetectedLanguage('ko-KR')).toBe('ko-KR')
+  })
+})
+
+describe('normalizeInterfaceLanguage', () => {
+  test('keeps supported interface codes', () => {
+    for (const code of ['en', 'zhCN', 'zhTW', 'fr', 'ru', 'ja', 'vi']) {
+      expect(normalizeInterfaceLanguage(code)).toBe(code)
+    }
+  })
+
+  test('maps Spanish, Portuguese and Korean regional tags onto base codes', () => {
+    expect(normalizeInterfaceLanguage('es')).toBe('es')
+    expect(normalizeInterfaceLanguage('es-MX')).toBe('es')
+    expect(normalizeInterfaceLanguage('pt')).toBe('pt')
+    expect(normalizeInterfaceLanguage('pt-BR')).toBe('pt')
+    expect(normalizeInterfaceLanguage('pt_PT')).toBe('pt')
+    expect(normalizeInterfaceLanguage('ko')).toBe('ko')
+    expect(normalizeInterfaceLanguage('ko-KR')).toBe('ko')
+  })
+
+  test('falls back to en for unknown values', () => {
+    expect(normalizeInterfaceLanguage('de')).toBe('en')
+    expect(normalizeInterfaceLanguage('')).toBe('en')
+    expect(normalizeInterfaceLanguage(null)).toBe('en')
   })
 })

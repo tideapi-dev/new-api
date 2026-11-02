@@ -27,6 +27,9 @@ const PRESERVED_LOCAL_STORAGE_KEYS = new Set([
   'uid',
   'aff',
   'oauth:binding:result',
+  // Keep the i18next language choice (also written by the marketing site)
+  // so the first cache reset does not drop the visitor's language.
+  'i18nextLng',
 ])
 
 export function initializeFrontendCache(): void {

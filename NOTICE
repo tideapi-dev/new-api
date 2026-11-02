@@ -24,6 +24,24 @@ https://github.com/QuantumNous/new-api
 Modified versions must not misrepresent the origin of the software and must
 mark their changes in accordance with AGPLv3 Section 7(c).
 
+==== Modifications (AGPLv3 Section 7(c)) ====
+
+Modified by Tide API (2026-11): added Spanish, Portuguese (Brazil) and Korean
+translations for the web UI.
+
+Changed files (relative to upstream tag v1.0.0-rc.47):
+- web/src/i18n/locales/es.json, pt-BR.json, ko.json (new; partial
+  translations of customer-facing strings, other strings fall back to English)
+- web/src/i18n/config.ts, web/src/i18n/languages.ts,
+  web/src/i18n/languages.test.ts (register es / pt / ko)
+- web/src/components/date-picker.tsx, web/src/components/datetime-picker.tsx
+  (calendar locales for es / pt / ko)
+- web/src/lib/frontend-cache.ts (keep the saved UI language, i18nextLng,
+  across the first-visit cache reset)
+- NOTICE (this section)
+
+The original attribution and project link above are preserved unchanged.
+
 ==== Third-Party Notices ====
 
 This product includes third-party open source software. Copyright notices and

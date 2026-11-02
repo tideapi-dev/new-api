@@ -24,6 +24,9 @@ export const INTERFACE_LANGUAGE_OPTIONS = [
   { code: 'ja', label: '日本語' },
   { code: 'vi', label: 'Tiếng Việt' },
   { code: 'zhTW', label: '繁體中文' },
+  { code: 'es', label: 'Español' },
+  { code: 'pt', label: 'Português (Brasil)' },
+  { code: 'ko', label: '한국어' },
 ] as const
 
 export type InterfaceLanguageCode =
@@ -43,6 +46,12 @@ export function normalizeInterfaceLanguage(value?: string | null): string {
   }
   if (value === 'zh-CN' || value === 'zh-Hans' || value === 'zhCN') {
     normalized = 'zhCN'
+  }
+  // Regional tags for the Tide API locales (`es-MX`, `pt-BR`, `ko-KR`, ...)
+  // collapse onto their base interface code.
+  const base = normalized.split('-')[0]
+  if (base === 'es' || base === 'pt' || base === 'ko') {
+    normalized = base
   }
 
   return INTERFACE_LANGUAGE_OPTIONS.some((lang) => lang.code === normalized)

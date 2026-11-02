@@ -41,6 +41,7 @@ import { Label } from '@/components/ui/label'
 import { register, wechatLoginByCode } from '@/features/auth/api'
 import { LegalConsent } from '@/features/auth/components/legal-consent'
 import { OAuthProviders } from '@/features/auth/components/oauth-providers'
+import { RegionConsent } from '@/features/auth/components/region-consent'
 import { registerFormSchema } from '@/features/auth/constants'
 import { useAuthRedirect } from '@/features/auth/hooks/use-auth-redirect'
 import { useEmailVerification } from '@/features/auth/hooks/use-email-verification'
@@ -63,11 +64,15 @@ export function SignUpForm({
   const [isLoading, setIsLoading] = useState(false)
   const [verificationCode, setVerificationCode] = useState('')
   const [agreedToLegal, setAgreedToLegal] = useState(false)
+  const [confirmedRegion, setConfirmedRegion] = useState(false)
   const [wechatCode, setWeChatCode] = useState('')
   const [isWeChatDialogOpen, setIsWeChatDialogOpen] = useState(false)
   const [isWeChatSubmitting, setIsWeChatSubmitting] = useState(false)
   const [turnstileWidgetKey, setTurnstileWidgetKey] = useState(0)
   const legalConsentErrorMessage = t('Please agree to the legal terms first')
+  const regionConsentErrorMessage = t(
+    'Please confirm you are not using this service from mainland China'
+  )
 
   const { status } = useStatus()
   const {
@@ -140,6 +145,11 @@ export function SignUpForm({
   }, [])
 
   async function onSubmit(data: z.infer<typeof registerFormSchema>) {
+    if (!confirmedRegion) {
+      toast.error(regionConsentErrorMessage)
+      return
+    }
+
     if (requiresLegalConsent && !agreedToLegal) {
       toast.error(legalConsentErrorMessage)
       return
@@ -193,6 +203,11 @@ export function SignUpForm({
   }
 
   const handleOpenWeChatDialog = () => {
+    if (!confirmedRegion) {
+      toast.error(regionConsentErrorMessage)
+      return
+    }
+
     if (requiresLegalConsent && !agreedToLegal) {
       toast.error(legalConsentErrorMessage)
       return
@@ -210,6 +225,11 @@ export function SignUpForm({
   }
 
   async function handleWeChatLogin() {
+    if (!confirmedRegion) {
+      toast.error(regionConsentErrorMessage)
+      return
+    }
+
     if (!wechatCode.trim()) {
       toast.error(t('Please enter the verification code'))
       return
@@ -361,6 +381,12 @@ export function SignUpForm({
           </div>
         )}
 
+        <RegionConsent
+          checked={confirmedRegion}
+          onCheckedChange={setConfirmedRegion}
+          className='mt-1'
+        />
+
         <LegalConsent
           status={status}
           checked={agreedToLegal}
@@ -374,6 +400,7 @@ export function SignUpForm({
           className='mt-2 w-full justify-center gap-2'
           disabled={
             isLoading ||
+            !confirmedRegion ||
             (requiresLegalConsent && !agreedToLegal) ||
             !turnstileReady
           }
@@ -385,7 +412,11 @@ export function SignUpForm({
         {oauthRegisterEnabled && (
           <OAuthProviders
             status={status}
-            disabled={isLoading || (requiresLegalConsent && !agreedToLegal)}
+            disabled={
+              isLoading ||
+              !confirmedRegion ||
+              (requiresLegalConsent && !agreedToLegal)
+            }
             onWeChatLogin={hasWeChatLogin ? handleOpenWeChatDialog : undefined}
             isWeChatLoading={isWeChatSubmitting}
             className='pt-2'
@@ -421,6 +452,7 @@ export function SignUpForm({
                 disabled={
                   isWeChatSubmitting ||
                   !wechatCode.trim() ||
+                  !confirmedRegion ||
                   (requiresLegalConsent && !agreedToLegal)
                 }
                 className='gap-2'
